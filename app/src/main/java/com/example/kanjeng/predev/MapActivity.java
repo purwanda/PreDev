@@ -10,8 +10,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -57,6 +61,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    EditText mEvent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,6 +149,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         }
+    }
+
+    public void AddEvent(View view){
+        Toast.makeText(this, "AddEvent", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_add_event, null);
+        mEvent = (EditText)mView.findViewById(R.id.etEvent);
+        Button mLogin = (Button)mView.findViewById(R.id.btnSend);
+        mBuilder.setView(mView);
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
     }
 
 }
