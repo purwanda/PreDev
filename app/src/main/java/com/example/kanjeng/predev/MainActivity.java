@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     public TextView textView;
@@ -39,7 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    DB_Controller controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +56,76 @@ public class MainActivity extends AppCompatActivity {
             init();
         }
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    toastMessage("Berhasil sign in dengan "+user.getEmail());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    toastMessage("Berhasil sign out ");
+                }
+                // ...
+            }
+        };
 
         editTextEmail = (EditText)findViewById(R.id.editTextEmail);
         editTextPassword = (EditText)findViewById(R.id.editTextPassword);
+
+        controller = new DB_Controller(this,"",null,1);
+    }
+
+    public void btn_click(View view){
+        switch (view.getId()){
+            case R.id.buttonAdd:
+                controller.insert_email(editTextEmail.getText().toString(),editTextPassword.getText().toString());
+                toastMessage("selesai menambahkan di sqlite");
+                break;
+            case R.id.buttonList:
+                controller.list_email(textView);
+                toastMessage("selesai menampilkan data dari sqlite");
+                break;
+        }
+    }
+
+    public void signIn(View view){
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        if (!email.equals("") && !password.equals("")){
+            mAuth.signInWithEmailAndPassword(email,password);
+        } else
+        {
+            Toast.makeText(this,"Lengkapi email dan password",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toastMessage(String message){
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
+    }
+
+    public void signOut(View view){
+        mAuth.signOut();
+        toastMessage("Sign out ...");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 
     public void registerUser(View view){
@@ -72,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "createUserWithEmailAndPassword : hasilnya");
