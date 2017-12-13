@@ -22,11 +22,14 @@ public class DB_Controller extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE USER(EMAIL TEXT UNIQUE,PASSWORD TEXT);");
+        sqLiteDatabase.execSQL("CREATE TABLE EVENT(IDEVENT INTEGER UNIQUE,LAT TEXT,LONG TEXT,KET TEXT);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS STUDENTS;");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS USER;");
+        onCreate(sqLiteDatabase);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS EVENT;");
         onCreate(sqLiteDatabase);
     }
 
@@ -37,12 +40,30 @@ public class DB_Controller extends SQLiteOpenHelper {
         this.getWritableDatabase().insertOrThrow("USER","",contentValues);
     }
 
+    public void insert_event(Integer id, String lat,String lon,String ket){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("IDEVENT",id);
+        contentValues.put("LAT",lat);
+        contentValues.put("LONG",lon);
+        contentValues.put("KET",ket);
+        this.getWritableDatabase().insertOrThrow("EVENT","",contentValues);
+    }
+
     public void list_email(TextView textView){
         Log.d("DB_Controller", "list_email : mulai");
         Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * from USER",null);
         textView.setText("");
         while (cursor.moveToNext()){
             textView.append(cursor.getString(0) +" "+cursor.getString(1)+"\n" );
+        }
+    }
+
+    public void list_event(TextView textView){
+        Log.d("DB_Controller", "list_event: mulai");
+        Cursor cursor = this.getReadableDatabase().rawQuery("SELECT * from EVENT",null);
+        textView.setText("");
+        while (cursor.moveToNext()){
+            textView.append(cursor.getString(0) +" "+cursor.getString(1)+" "+cursor.getString(2)+" "+cursor.getString(3)+"\n" );
         }
     }
 }

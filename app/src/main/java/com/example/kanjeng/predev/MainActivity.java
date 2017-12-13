@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    DB_Controller controller;
+    public DB_Controller controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,15 @@ public class MainActivity extends AppCompatActivity {
         editTextPassword = (EditText)findViewById(R.id.editTextPassword);
 
         controller = new DB_Controller(this,"",null,1);
+        cekJmlUser();
+    }
+
+    public void cekJmlUser(){
+        Cursor cursor = controller.getReadableDatabase().rawQuery("SELECT count(*) from USER",null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+        textView.setText(String.valueOf(count));
     }
 
     public void btn_click(View view){

@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,32 +27,18 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * Created by kanjeng on 12/1/2017.
  */
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onMapready : map is ready");
-        mMap = googleMap;
-
-        if (mLocationPermissionsGranted) {
-            getDeviceLocation();
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            mMap.setMyLocationEnabled(true);
-        }
-    }
 
     private static final String TAG = "MapActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -62,16 +49,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     EditText mEvent;
+    public TextView lokasi;
+    public AlertDialog dialog;
+    public Location currentLocation;
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onMapready : map is ready");
+        mMap = googleMap;
+
+        if (mLocationPermissionsGranted) {
+            currentLocation = getDeviceLocation();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        lokasi = (TextView)findViewById(R.id.textLokasi);
 
         getLocationPermission();
     }
 
-    private void getDeviceLocation(){
+    private Location getDeviceLocation(){
         Log.d(TAG,"getDeviceLocation : getting the device current location");
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
@@ -81,10 +89,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()){
-                            Log.d(TAG,"onComplete: found location!");
-                            Location currentLocation = (Location) task.getResult();
+                            currentLocation = (Location) task.getResult();
+                            Log.d(TAG,"onComplete: found location! "+currentLocation.getLatitude()+","+currentLocation.getLongitude());
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                     DEFAULT_ZOOM);
+//                            lokasi.setText(currentLocation.getLatitude()+","+currentLocation.getLongitude());
                         }else {
                             Log.d(TAG,"onComplete: current location is null");
                             Toast.makeText(MapActivity.this,"unable to get current location",Toast.LENGTH_SHORT).show();
@@ -95,6 +104,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }catch (SecurityException e){
             Log.e(TAG,"getDeviceLocation : SecurityException: "+e.getMessage());
         }
+        return currentLocation;
     }
 
     private void moveCamera(LatLng latLng, float zoom){
@@ -152,14 +162,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void AddEvent(View view){
-        Toast.makeText(this, "AddEvent", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,currentLocation.getLatitude()+","+currentLocation.getLongitude(),Toast.LENGTH_SHORT).show();
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_add_event, null);
         mEvent = (EditText)mView.findViewById(R.id.etEvent);
         Button mLogin = (Button)mView.findViewById(R.id.btnSend);
         mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
+        dialog = mBuilder.create();
         dialog.show();
+    }
+
+    public void sendEvent(View view){
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+        currentLocation=getDeviceLocation();
+
+        lokasi.setText(currentDateTimeString);
+
+        MarkerOptions options = new MarkerOptions()
+                .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                .title(mEvent.getText().toString());
+        mMap.addMarker(options);
+        Toast.makeText(this,currentLocation.getLatitude()+","+currentLocation.getLongitude(),Toast.LENGTH_SHORT).show();
+        dialog.dismiss();
     }
 
 }
