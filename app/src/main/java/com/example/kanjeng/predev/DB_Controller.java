@@ -66,4 +66,39 @@ public class DB_Controller extends SQLiteOpenHelper {
             textView.append(cursor.getString(0) +" "+cursor.getString(1)+" "+cursor.getString(2)+" "+cursor.getString(3)+"\n" );
         }
     }
+
+    public String getEmail() {
+        Cursor cursor = null;
+        String empName = "";
+        try {
+            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM USER", null);
+            if(cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                empName = cursor.getString(0);
+            }
+            return empName;
+        }finally {
+            cursor.close();
+        }
+    }
+
+    public String getPassword() {
+        Cursor cursor = null;
+        String empName = "";
+        try {
+            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM USER", null);
+            if(cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                empName = cursor.getString(1);
+            }
+            return empName;
+        }finally {
+            cursor.close();
+        }
+    }
+
+    public void truncateData() {
+        this.getWritableDatabase().delete("USER",null,null);
+    }
+
 }

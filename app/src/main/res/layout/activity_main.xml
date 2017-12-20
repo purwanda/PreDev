@@ -165,4 +165,52 @@
         app:layout_constraintTop_toTopOf="@+id/buttonAdd"
         app:layout_constraintVertical_bias="1.0" />
 
+    <Button
+        android:id="@+id/button1user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="btn_click"
+        android:text="show user"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/buttonAdd"
+        app:layout_constraintRight_toRightOf="@+id/buttonAdd"
+        app:layout_constraintTop_toBottomOf="@+id/buttonAdd"
+        app:layout_constraintVertical_bias="0.018" />
+
+    <Button
+        android:id="@+id/buttonHapus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="btn_click"
+        android:text="HapusUser"
+        app:layout_constraintBottom_toBottomOf="@+id/button1user"
+        app:layout_constraintHorizontal_bias="0.088"
+        app:layout_constraintLeft_toRightOf="@+id/button1user"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button1user"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="getTme"
+        android:text="SHOW TIME"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSignout"
+        app:layout_constraintVertical_bias="0.084" />
+
 </android.support.constraint.ConstraintLayout>

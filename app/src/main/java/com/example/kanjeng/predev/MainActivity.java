@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +31,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
     public TextView textView;
     Handler setDelay;
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     public DB_Controller controller;
+    SQLiteDatabase sqLiteDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             init();
         }
 
+        Log.d(TAG, "mulai autentifikasi");
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -100,6 +106,15 @@ public class MainActivity extends AppCompatActivity {
             case R.id.buttonList:
                 controller.list_email(textView);
                 toastMessage("selesai menampilkan data dari sqlite");
+                break;
+            case R.id.button1user:
+                textView.setText("user:"+controller.getEmail()+",password:"+controller.getPassword());
+                toastMessage("selesai menampilkan 1 data dari sqlite");
+                break;
+            case R.id.buttonHapus:
+                controller.truncateData();
+//                textView.setText("user:"+controller.getEmail()+",password:"+controller.getPassword());
+                toastMessage("Hapus data dari sqlite");
                 break;
         }
     }
@@ -227,5 +242,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"You can't make map request",Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    public void getTme(View view){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+//        Date currentTime = Calendar.getInstance().getTime();
+        Toast.makeText(this,currentDateandTime,Toast.LENGTH_SHORT).show();
     }
 }
